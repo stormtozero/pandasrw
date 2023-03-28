@@ -2,6 +2,7 @@ import os
 import pandas as pd
 import polars as pl
 import xlwings as xw
+from xlsx2csv import Xlsx2csv
 from chardet.universaldetector import UniversalDetector
 
 #将csv转化为utf8编码
