@@ -2,6 +2,23 @@
 一个高效易用的pandas  I/O库
 pandas的I/O相对各类包一直偏慢且存在易用性问题，特别是对于大文件的读写，瓶颈非常明显。pandasio 库通过将各类库进一步封装，提高了pandas 读写excel、csv等文件的性能和易用性。
 
+通过pip进行安装
+
+```
+pip install pandasrw
+```
+
+通过import导入包
+
+```
+import pandasrw
+```
+
+或者
+
+```
+from pandasrw import load,dump
+```
 
 一、常用API
 
