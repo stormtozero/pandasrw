@@ -1,4 +1,4 @@
-# pandasio
+# pandasrw
 一个高效易用的pandas  I/O库
 pandas的I/O相对各类包一直偏慢且存在易用性问题，特别是对于大文件的读写，瓶颈非常明显。pandasio 库通过将各类库进一步封装，提高了pandas 读写excel、csv等文件的性能和易用性。
 
@@ -14,7 +14,7 @@ pip install pandasrw
 import pandasrw
 ```
 
-或者
+或者导入各函数简化使用，本库支持的函数见下文API部分。
 
 ```
 from pandasrw import load,dump
