@@ -142,10 +142,14 @@ xlwings库：
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/b8347a47a68d419bbfaaa02f58126e9a.png#pic_center)
 
 2、易用性提升
-易用性方面主要做了以下三个方面的提升 
-2.1、对csv格式的编码自动修改为utf-8解决了 “‘utf-8’ codec can’t decode”等编码类报错。 
+易用性方面主要做了以下三个方面的提升
+
+2.1、对csv格式的编码自动修改为utf-8解决了 “‘utf-8’ codec can’t decode”等编码类报错。
+
 2.2、对各类后缀进行了自适应，无需在手动指定excel、csv、pickle等
+
 2.3、方便的实现csv、excel的追加写和在后缀加写入时间。
+
 2.4、可以通过excel中随时查看DataFrame或文件，方便在jupyter等交互环境中使用。
 
 3、大内存表的流式加载和计算
