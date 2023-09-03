@@ -1,6 +1,6 @@
 # pandasrw
 一个高效易用的pandas  I/O库
-pandas的I/O相对各类包一直偏慢且存在易用性问题，特别是对于大文件的读写，瓶颈非常明显。pandasio 库通过将各类库进一步封装，提高了pandas 读写excel、csv等文件的性能和易用性。
+pandas的I/O相对各类包一直偏慢且存在易用性问题，特别是对于大文件的读写，瓶颈非常明显。pandasio 库通过将各类库进一步封装，提高了pandas 读写excel、csv等文件的性能和易用性。性能和易用性提升详细说明见第二部分。
 
 通过pip进行安装
 
@@ -22,28 +22,60 @@ from pandasrw import load,dump
 
 一、常用API
 
-1、加载表
+本库的常用API为三个为load、dump和view，分别实现了文件的读取、写入和查看；其中查看功能为通过excel打开DataFrame或者文件，主要用于upyter等交互环境。此外还有流式加载表、csv转换为utf8编码、xlsx转换为csv等功能。
 
+1、加载表
+能够自动识别后缀和修改编码方式来实现加载。
 ```
 df=load(file_path, col_name=None,sheetname='Sheet1',engine="polars")
 ```
-示例：输入路径读取Sheet1表的全部列，生产pandas的DataFrame 默认使用polars引擎。该表可以是xlsx、xlsx、csv和pkl格式
+示例：输入路径读取Sheet1表的全部列，生成pandas的DataFrame。 默认使用polars引擎，该表可以是xlsx、xlsx、csv和pkl格式。
 
 ```
 df=load(file_path)
 ```
 
 2、写入表
-
+能够自动识别后缀写入，还实现了追加写和在后缀增加写入时间的功能。
 ```
 dump(df,file_path,sheetname='Sheet1',engine="polars")
 ```
 示例：输入路径，将pandas的DataFrame写入Sheet1表，默认使用polars引擎。该表可以是xlsx、xlsx、csv和pkl格式
 
+
+
+能够自动识别后缀写入，还实现了追加写和在后缀增加写入时间的功能。
+```
+dump(df, file_path, mode=None, sheetname='Sheet1', time=False, engine="polars", cell='A1', visible=False,close=True)
+```
+示例：输入路径，将pandas的DataFrame写入Sheet1表，默认使用polars引擎，该表可以是xlsx、xlsx、csv和pkl格式。
+
 ```
 dump(df,file_path)
 ```
-3、流式加载表
+2.1、追加写
+当参数mode="a"时能够追加写。
+```
+dump(df, file_path, mode="a", sheetname='Sheet1',cell='A1')
+```
+支持csv和excel的追加写。pandas对csv的追加写支持较好，但是对excel的追加写比较繁琐。本库通过分别通过pandas和xlwings实现了追加写，其中小数据集通过pandas较为快速方便，对于大数据集或者需要指定写入文件单元格的情况使用xlwings库。 注意：
+1、追加写时文档必须关闭，否则使用pandas引擎会报错，xlwings不会报错但是无法追加写入
+2、需要指定写入文件单元格的情况引擎必须使用xlwings库，既engine == "xlwings"
+```
+dump(df, file_path, mode="a", sheetname='Sheet1',engine="xlwings", cell='A1')
+```
+2.3、后缀增加时间戳
+当参数 time=False 时能够在文件后缀上自动添加写入时间的功能，时间格式为  -年月日_时分
+```
+dump(df, file_path, sheetname='Sheet1', time=False)
+```
+3、查看表
+可以在excel中打开DataFrame和文件路径进行查看，方便在jupyter等交互环境中使用。输入参数f既可以是文件路径也可以是DataFrame。
+```
+view(f)
+```
+
+4、流式加载表
 
 file_path是路径， row_count是没错读取的行
 ```
@@ -53,11 +85,11 @@ load_stream_row(file_path, row_count,col_name=None)
 
 对于该迭代器对象，通过遍历迭代器分块运算
 
-3.1、遍历迭代器
+4.1、遍历迭代器
 
-3.2、对于迭代器中的每个DataFrame进行运算
+4.2、对于迭代器中的每个DataFrame进行运算
 
-3.3、采用追加写（功能mode="a"或者mode="a+"）的方式写入csv。
+4.3、采用追加写（功能mode="a"或者mode="a+"）的方式写入csv。
 
 注意：file_result_csv和上文函数中的file_path_csv绝对不能相同，即读取的csv和存入的csv不能同路径。否则会不停的迭代下去，不能退出循环。
 
@@ -74,12 +106,12 @@ for df in df_iter:
 ```
 df_iter=load_stream_row(file_path, row_count）
 ```
-4、将csv转化为utf8编码
+5、将csv转化为utf8编码
 
 ```
 encode_to_utf8(filename, des_encode):
 ```
-5、将xlsx转换为csv
+6、将xlsx转换为csv
 
 ```
  xlsxtocsv(file_path)
@@ -108,19 +140,17 @@ xlwings库：
 
 
 ![在这里插入图片描述](https://img-blog.csdnimg.cn/b8347a47a68d419bbfaaa02f58126e9a.png#pic_center)
+
 2、易用性提升
-易用性方面主要做了以下二个方面的提升
-2.1、对csv格式的编码自动修改为utf-8解决了 “'utf-8' codec can't decode”等编码类报错。
+易用性方面主要做了以下三个方面的提升 
+2.1、对csv格式的编码自动修改为utf-8解决了 “‘utf-8’ codec can’t decode”等编码类报错。 
 2.2、对各类后缀进行了自适应，无需在手动指定excel、csv、pickle等
+2.3、方便的实现csv、excel的追加写和在后缀加写入时间。
+2.4、可以通过excel中随时查看DataFrame或文件，方便在jupyter等交互环境中使用。
 
 3、大内存表的流式加载和计算
 为了API的简洁暂时只实现了一个sheet的表格的流式加载和计算
-
 <pandas.io.parsers.readers.TextFileReader at 0x2597d4080d0>
 
-四、xlsx到csv的转换
-
-#https://github.com/dilshod/xlsx2csv
-
-
-五、如果一个较大的表会多次使用，请转pickle存储，后续读写pickle文件会大大加快读写性能。
+4、pickle支持
+如果一个较大的表会多次使用，请转pickle存储，后续读写pickle文件会大大加快读写性能，本库支持pickle文件的读取和写入。
